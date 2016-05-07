@@ -1,0 +1,10 @@
+﻿html,
+body {
+  background-color: #ffd800;
+  font-family: 'RobotoRegular', 'Droid Sans', 'Segoe UI', Segoe, 'San Francisco', 'Helvetica Neue', Helvetica, Arial, Geneva, sans-serif;
+  font-size: 12px;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}

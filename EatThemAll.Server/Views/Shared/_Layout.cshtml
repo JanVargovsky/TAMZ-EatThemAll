@@ -1,0 +1,26 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+</head>
+<body>
+    <nav>
+
+    </nav>
+    <div>
+        @RenderBody()
+    </div>
+
+    <script src="~/Scripts/jquery-1.6.4.min.js"></script>
+    @*<script src="~/Scripts/jquery.signalR-2.2.0.min.js"></script>*@
+    <script src="~/Scripts/jquery.signalR-2.2.0.js"></script>
+    @Scripts.Render("~/signalr/hubs")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

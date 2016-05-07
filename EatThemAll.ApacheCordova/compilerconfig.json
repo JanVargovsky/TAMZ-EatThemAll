@@ -1,0 +1,22 @@
+﻿[
+  {
+    "outputFile": "www/scripts/script.es5.js",
+    "inputFile": "www/scripts/script.js"
+  },
+  {
+    "outputFile": "www/scripts/index.es5.js",
+    "inputFile": "www/scripts/index.js"
+  },
+  {
+    "outputFile": "www/scripts/EatThemAll.es5.js",
+    "inputFile": "www/scripts/EatThemAll.js"
+  },
+  {
+    "outputFile": "www/css/index.css",
+    "inputFile": "www/css/index.less"
+  },
+  {
+    "outputFile": "www/scripts/EatThemAll.es5.es5.js",
+    "inputFile": "www/scripts/EatThemAll.es5.js"
+  }
+]

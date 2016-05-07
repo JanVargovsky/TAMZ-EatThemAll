@@ -1,0 +1,23 @@
+﻿
+<h1>Running</h1>
+<h5>Players @ViewBag.PlayersCount</h5>
+<h5>Bots @ViewBag.BotsCount</h5>
+
+@section scripts{
+    <script>
+        var eatThemAllHub = $.connection.eatThemAllHub;
+        console.log(eatThemAllHub);
+
+        eatThemAllHub.client.updateDestination = function (players) {
+            //console.log(players);
+        };
+
+        $.connection.hub.start().done(function () {
+            console.log("start");
+        });
+
+        $.connection.hub.disconnected(function () {
+            console.log("disconnect");
+        });
+    </script>
+}
