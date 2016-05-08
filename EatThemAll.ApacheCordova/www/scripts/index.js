@@ -19,7 +19,8 @@
         //$.connection.hub.url = "http://vsb-tamz-var0065.azurewebsites.net/signalr";
         $.connection.hub.url = "http://localhost:23135/signalr";
         //$.connection.hub.logging = true;
-        var reconnecting = false;
+        var reconnecting = false,
+            delay = 100;
 
         var eatThemAllHub = $.connection.eatThemAllHub;
         if (typeof eatThemAllHub === "undefined") {
@@ -31,29 +32,33 @@
         game = new EatThemAll($("#canvas"), eatThemAllHub.server);
         //console.log(eatThemAllHub);
 
-        eatThemAllHub.client.updateDestination = (players) => game.render(players);
+        eatThemAllHub.client.update = (players) => game.render(players);
+        eatThemAllHub.client.setConnectionId = (id) => game.id = id;
 
         $.connection.hub.start(function () {
             console.log("start");
-            debugger;
-            game.id = $.connection.hub.id;
-            game.checkInitialize();
             game.start();
+            delay = 100;
+            reconnecting = false;
         });
 
         $.connection.hub.connectionSlow(function () {
         });
 
         $.connection.hub.disconnected(function () {
-            if ($.connection.hub.lastError)
+            if ($.connection.hub.lastError) {
                 console.log("Disconnected. Reason: " + $.connection.hub.lastError.message);
-
-            //debugger;
+                if (typeof navigator.notification.alert !== "undefined")
+                    navigator.notification.alert($.connection.hub.lastError.message, function () { }, "Disconnect", "OK");
+            }
 
             // try it again
             if (!reconnecting)
-                $.connection.hub.start();
-                //setTimeout(() =>$.connection.hub.start(), 1000);
+                setTimeout(() => {
+                    $.connection.hub.start();
+                    if (delay < 5000)
+                        delay *= 2;
+                }, delay);
         });
 
         $.connection.hub.reconnecting(function () {
@@ -62,11 +67,11 @@
         });
 
         $.connection.hub.reconnected(function () {
+            reconnecting = false;
         });
     };
 
     function onPause() {
-        // TODO: This application has been suspended. Save application state here.
         game.stop();
     };
 

@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace EatThemAll.Server.Game.Models
+namespace EatThemAll.Server.Game.Common
 {
     public class Point
     {

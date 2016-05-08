@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNet.SignalR;
 using System.Threading.Tasks;
 using EatThemAll.Server.Game.Models;
+using EatThemAll.Server.Game.Common;
 
 namespace EatThemAll.Server.Hubs
 {
@@ -18,14 +19,22 @@ namespace EatThemAll.Server.Hubs
         {
         }
 
-        public void UpdateDestination(Point point)
+        public void GetConnectionId()
         {
-            game.UpdateDestination(Context.ConnectionId, point);
+            Clients.Caller.setConnectionId(Context.ConnectionId);
+        }
+
+        public void UpdateDirection(Vector direction)
+        {
+            game.UpdateDirection(Context.ConnectionId, direction);
         }
 
         public override Task OnConnected()
         {
-            game.Players.Add(new Player(Context.ConnectionId, $"TAMZ({Context.ConnectionId.Substring(0, 3)})"));
+            game.AddNewPlayer(Context.ConnectionId);
+
+            Clients.Caller.setConnectionId(Context.ConnectionId);
+
             return base.OnConnected();
         }
 

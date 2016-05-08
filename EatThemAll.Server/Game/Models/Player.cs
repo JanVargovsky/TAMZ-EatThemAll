@@ -1,11 +1,10 @@
 ﻿using EatThemAll.Server.Game.Common;
 using Newtonsoft.Json;
 using System;
-using System.Drawing;
 
 namespace EatThemAll.Server.Game.Models
 {
-    public class Player
+    public class Player : LocationObject
     {
         [JsonProperty("id")]
         public string Id { get; }
@@ -13,65 +12,70 @@ namespace EatThemAll.Server.Game.Models
         [JsonProperty("name")]
         public string Name { get; }
 
-        [JsonProperty("location")]
-        public Point Location { get; set; }
-
         [JsonProperty("alpha")]
         public double Alpha { get; set; }
 
         [JsonProperty("radius")]
-        public double Radius { get; set; }
+        public double Radius => Score + 15;
 
         [JsonProperty("score")]
         public int Score { get; set; }
 
         [JsonIgnore]
-        public Point Destination { get; set; }
+        public Vector Direction { get; set; }
 
         [JsonIgnore]
-        public double Speed { get; }
-
-        [JsonIgnore]
-        private readonly Color color;
+        private readonly System.Drawing.Color color;
 
         [JsonProperty("color")]
         public string Color => $"#{color.R:X2}{color.G:X2}{color.B:X2}";
 
         protected static readonly Random random = new Random();
 
+        [JsonIgnore]
+        public double MaxSpeed { get; }
+
         public Player(string id, string name)
         {
             Id = id;
             Name = name;
-            Speed = 1.5d;
-
-#if DEBUG
-            Location = Destination = new Point { X = random.Next(500), Y = random.Next(500) };
-#else
-            Location = new Point();
-            Destination = new Point();
-#endif
+            Direction = new Vector();
             color = System.Drawing.Color.FromArgb(random.Next());
             Alpha = 1;
-            Radius = 15;
+            Score = 0;
+            MaxSpeed = 1.5d;
         }
 
-        public virtual bool MoveUpdate()
+        public virtual bool MoveUpdate(int width, int height)
         {
-            if (Location.Equals(Destination))
+            var speed = Direction.Length;
+            if (speed == 0)
                 return false;
 
-            // TODO: Set and store it when Destination is set
-            Vector vector = new Vector
+            if (speed > MaxSpeed)
+                speed = MaxSpeed;
+
+            var update = Vector.Normalize(Direction, speed);
+
+            var newLocation = new Point
             {
-                X = Destination.X - Location.X,
-                Y = Destination.Y - Location.Y,
+                X = Location.X + update.X,
+                Y = Location.Y + update.Y,
             };
 
-            vector.Normalize(vector.Length < Speed ? vector.Length : Speed);
+            if (newLocation.X < 0)
+                newLocation.X = 0;
+            else if (newLocation.X > width)
+                newLocation.X = width;
 
-            Location.X += vector.X;
-            Location.Y += vector.Y;
+            if (newLocation.Y < 0)
+                newLocation.Y = 0;
+            else if (newLocation.Y > height)
+                newLocation.Y = height;
+
+            // Check collisions
+
+            Location = newLocation;
 
             return true;
         }

@@ -81,10 +81,15 @@
         proxies['eatThemAllHub'] = this.createHubProxy('eatThemAllHub'); 
         proxies['eatThemAllHub'].client = { };
         proxies['eatThemAllHub'].server = {
-            updateDestination: function (point) {
-            /// <summary>Calls the UpdateDestination method on the server-side EatThemAllHub hub.&#10;Returns a jQuery.Deferred() promise.</summary>
-            /// <param name=\"point\" type=\"Object\">Server side type is EatThemAll.Server.Game.Models.Point</param>
-                return proxies['eatThemAllHub'].invoke.apply(proxies['eatThemAllHub'], $.merge(["UpdateDestination"], $.makeArray(arguments)));
+            getConnectionId: function () {
+            /// <summary>Calls the GetConnectionId method on the server-side EatThemAllHub hub.&#10;Returns a jQuery.Deferred() promise.</summary>
+                return proxies['eatThemAllHub'].invoke.apply(proxies['eatThemAllHub'], $.merge(["GetConnectionId"], $.makeArray(arguments)));
+             },
+
+            updateDirection: function (direction) {
+            /// <summary>Calls the UpdateDirection method on the server-side EatThemAllHub hub.&#10;Returns a jQuery.Deferred() promise.</summary>
+            /// <param name=\"direction\" type=\"Object\">Server side type is EatThemAll.Server.Game.Common.Vector</param>
+                return proxies['eatThemAllHub'].invoke.apply(proxies['eatThemAllHub'], $.merge(["UpdateDirection"], $.makeArray(arguments)));
              }
         };
 

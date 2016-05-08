@@ -18,5 +18,21 @@ namespace EatThemAll.Server.Game.Common
             X /= ratio;
             Y /= ratio;
         }
+
+        public static Vector Normalize(Vector vector, double length = 1)
+        {
+            var result = vector.Copy();
+            result.Normalize(length);
+            return result;
+        }
+
+        public Vector Copy()
+        {
+            return new Vector
+            {
+                X = X,
+                Y = Y
+            };
+        }
     }
 }
