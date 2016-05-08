@@ -1,9 +1,5 @@
-﻿using EatThemAll.Server.Game.Models;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace EatThemAll.Server.Game.Common
 {

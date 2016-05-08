@@ -7,14 +7,6 @@
         "is_top_level": true,
         "variables": {}
     },
-    "cordova-plugin-vibration": {
-        "source": {
-            "type": "registry",
-            "id": "cordova-plugin-vibration@~2.1.0"
-        },
-        "is_top_level": true,
-        "variables": {}
-    },
     "cordova-plugin-geolocation": {
         "source": {
             "type": "registry",
@@ -59,6 +51,22 @@
         "source": {
             "type": "registry",
             "id": "cordova-plugin-device-orientation@~1.0.2"
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "cordova-plugin-vibration": {
+        "source": {
+            "type": "registry",
+            "id": "cordova-plugin-vibration@~2.1.0"
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "cordova-plugin-dialogs": {
+        "source": {
+            "type": "registry",
+            "id": "cordova-plugin-dialogs@~1.2.0"
         },
         "is_top_level": true,
         "variables": {}

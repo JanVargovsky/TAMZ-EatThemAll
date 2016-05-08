@@ -1,23 +1,36 @@
-﻿
+﻿@model EatThemAllSettingsModel
+
 <h1>Running</h1>
-<h5>Players @ViewBag.PlayersCount</h5>
-<h5>Bots @ViewBag.BotsCount</h5>
+<div>
+    <a href="@Url.Action("AddBot", "Home")">Add new bot</a>
+
+    <h3>Players (@Model.Players.Count)</h3>
+    @using (Html.BeginForm())
+    {
+        <ul>
+            @foreach (var player in Model.Players)
+            {
+                <li>
+                    @Html.HiddenFor(Model => player.Id)
+                    <span>@player.Name (@player.Score)</span>
+                    <a href="@Url.Action("KillPlayer", "Home", new { id = player.Id })">Kill</a>
+                </li>
+            }
+        </ul>
+    }
+</div>
 
 @section scripts{
     <script>
-        var eatThemAllHub = $.connection.eatThemAllHub;
-        console.log(eatThemAllHub);
+        //var eatThemAllHub = $.connection.eatThemAllHub;
+        //console.log(eatThemAllHub);
 
-        eatThemAllHub.client.updateDestination = function (players) {
-            //console.log(players);
-        };
+        //$.connection.hub.start().done(function () {
+        //    console.log("start");
+        //});
 
-        $.connection.hub.start().done(function () {
-            console.log("start");
-        });
-
-        $.connection.hub.disconnected(function () {
-            console.log("disconnect");
-        });
+        //$.connection.hub.disconnected(function () {
+        //    console.log("disconnect");
+        //});
     </script>
 }

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNet.SignalR;
 using System.Threading.Tasks;
-using EatThemAll.Server.Game.Models;
 using EatThemAll.Server.Game.Common;
+using Microsoft.AspNet.SignalR.Hubs;
 
 namespace EatThemAll.Server.Hubs
 {
@@ -21,7 +21,7 @@ namespace EatThemAll.Server.Hubs
 
         public void GetConnectionId()
         {
-            Clients.Caller.setConnectionId(Context.ConnectionId);
+            Clients.Caller.SetConnectionId(Context.ConnectionId);
         }
 
         public void UpdateDirection(Vector direction)
@@ -33,7 +33,7 @@ namespace EatThemAll.Server.Hubs
         {
             game.AddNewPlayer(Context.ConnectionId);
 
-            Clients.Caller.setConnectionId(Context.ConnectionId);
+            Clients.Caller.SetConnectionId(Context.ConnectionId);
 
             return base.OnConnected();
         }

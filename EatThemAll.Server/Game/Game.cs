@@ -1,4 +1,5 @@
 ﻿using EatThemAll.Server.Game.Common;
+using EatThemAll.Server.Game.Helpers;
 using EatThemAll.Server.Game.Models;
 using EatThemAll.Server.Hubs;
 using Microsoft.AspNet.SignalR;
@@ -15,29 +16,43 @@ namespace EatThemAll.Server.Game
         public static Game Instance => instance.Value;
         #endregion
 
-        private readonly IHubContext hubContext;
+        private readonly IHubContext hub;
         private readonly TimeSpan interval = TimeSpan.FromMilliseconds(1000d / 30d);
         private readonly Timer timer;
         private readonly Random random = new Random();
+        private readonly FoodFactory foodFactory;
+        private readonly int MAX_FOOD = 50;
 
         public int Width { get; }
         public int Height { get; }
         public List<Player> Players { get; }
+        public List<Food> Foods { get; }
 
         public Game()
         {
-            hubContext = GlobalHost.ConnectionManager.GetHubContext<EatThemAllHub>();
+            hub = GlobalHost.ConnectionManager.GetHubContext<EatThemAllHub>();
             timer = new Timer(GameUpdate, null, TimeSpan.Zero, interval);
             Players = new List<Player>();
+            Foods = new List<Food>();
 
-            //for (int i = 0; i < 10; i++)
-            //    Players.Add(new Bot(Guid.NewGuid().ToString(), $"BOT#{i}"));
-
-            Players.Add(new Player("STATIC1", "STATIC1") { Location = new Point { X = 0, Y = 0 } });
-            Players.Add(new Player("STATIC2", "STATIC2") { Location = new Point { X = 0, Y = 100 } });
-            Players.Add(new Player("STATIC3", "STATIC3") { Location = new Point { X = 100, Y = 0 } });
-            Players.Add(new Player("STATIC4", "STATIC4") { Location = new Point { X = 100, Y = 100 } });
             Width = Height = 1000;
+            foodFactory = new FoodFactory(Width, Height);
+                
+            for (int i = 0; i < MAX_FOOD; i++)
+                Foods.Add(foodFactory.Create());
+        }
+
+        private int botId = 0;
+        public void AddNewBot()
+        {
+            Players.Add(new Bot(Guid.NewGuid().ToString(), $"BOT#{botId++}")
+            {
+                Location = new Point
+                {
+                    X = random.Next(0, Width),
+                    Y = random.Next(0, Height)
+                }
+            });
         }
 
         public void AddNewPlayer(string connectionId)
@@ -54,10 +69,62 @@ namespace EatThemAll.Server.Game
 
         private void GameUpdate(object state)
         {
-            foreach (var player in Players)
-                player.MoveUpdate(Width, Height);
+            Stack<Player> playersToRemove = new Stack<Player>();
 
-            hubContext.Clients.All.update(Players);
+            lock (instance)
+            {
+                foreach (var player in Players)
+                {
+                    // player moved
+                    if (player.MoveUpdate(Width, Height))
+                    {
+                        // Player collision check
+                        foreach (var otherPlayer in Players)
+                        {
+                            if (player.Id == otherPlayer.Id)
+                                continue;
+
+                            if (CollisionHelper.Intersects(player, otherPlayer))
+                            {
+                                // Player with higher score stays alive
+                                // if their score is equal then the player who was "bumped" is dead
+                                if (player.Score < otherPlayer.Score)
+                                {
+                                    playersToRemove.Push(player);
+                                    otherPlayer.Score += player.Score + 5;
+                                }
+                                else
+                                {
+                                    playersToRemove.Push(otherPlayer);
+                                    player.Score += otherPlayer.Score + 5;
+                                }
+                            }
+                        }
+
+                        // Food collision check
+                        Stack<Food> foodToRemove = new Stack<Food>();
+                        // check if he collide with food
+                        foreach (var food in Foods)
+                        {
+                            if (CollisionHelper.Intersects(player, food))
+                            {
+                                player.Score += food.Score;
+                                foodToRemove.Push(food);
+                            }
+                        }
+                        foreach (var food in foodToRemove)
+                        {
+                            Foods.Remove(food);
+                            Foods.Add(foodFactory.Create());
+                        }
+                    }
+                }
+
+                foreach (var player in playersToRemove)
+                    Kill(player);
+
+                hub.Clients.All.Update(Players, Foods);
+            }
         }
 
         public void UpdateDirection(string playerId, Vector direction)
@@ -68,6 +135,12 @@ namespace EatThemAll.Server.Game
                 return;
 
             player.Direction = direction;
+        }
+
+        public void Kill(Player player)
+        {
+            Players.Remove(player);
+            hub.Clients.Client(player.Id).NotifyDead(player.Score);
         }
     }
 }
